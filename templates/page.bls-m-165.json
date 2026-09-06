@@ -1,0 +1,39 @@
+{
+  "sections": {
+    "main": {
+      "type": "bls-builder",
+      "settings": {
+        "heading": "Build your men's base layer set — 165 GSM",
+        "subheading": "Lightweight 165 GSM merino. Choose your top and your bottoms — the 15% bundle discount is applied automatically.",
+        "step1_label": "Select top",
+        "step2_label": "Select bottoms",
+        "step3_label": "Add to basket",
+        "step1_title": "Step 1 — Choose your top",
+        "step2_title": "Step 2 — Choose your bottoms",
+        "size_label": "Choose your size",
+        "not_selected_text": "Nothing selected yet",
+        "empty_text": "No products found. Check the collection and product types for this step in the theme editor.",
+        "collection_top": "mens-base-layer-tops",
+        "types_top": "Men's Long Sleeve 165",
+        "collection_bottom": "mens-base-layer-pants",
+        "types_bottom": "Men's Pants 165",
+        "discount_percent": 15,
+        "discount_code": "",
+        "bundle_tag": "BLS-M-165",
+        "summary_title": "Your set",
+        "slot_top_empty": "Top not selected",
+        "slot_bottom_empty": "Bottoms not selected",
+        "remove_text": "Remove",
+        "subtotal_text": "Subtotal",
+        "discount_text": "Bundle discount",
+        "total_text": "Total",
+        "cta_text": "Add set to basket",
+        "added_text": "Added to your basket",
+        "perks": "Free UK delivery on orders over £49.99 | 30-day returns | 100% merino wool"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

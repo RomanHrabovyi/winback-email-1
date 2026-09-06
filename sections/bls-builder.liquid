@@ -1,0 +1,441 @@
+{%- comment -%}
+  ============================================================
+  BLS BUILDER — Build Your Own Base Layer Set (UK)
+  Merino.tech UK / merinotech.co.uk
+  Theme: Copy of kalles-v5-4-2-official, build bls
+  ------------------------------------------------------------
+  One section powers all 6 GSM pages (W/M x 165/250/320).
+  Everything is set per page in the theme editor:
+    - Top collection + product types
+    - Bottom collection + product types
+    - Bundle discount % and discount code
+  ============================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign col_top = section.settings.collection_top
+  assign col_bottom = section.settings.collection_bottom
+  assign types_top = section.settings.types_top | downcase | split: ','
+  assign types_bottom = section.settings.types_bottom | downcase | split: ','
+  assign disc = section.settings.discount_percent
+  assign uid = section.id
+-%}
+
+<style>
+  .bls{--bls-ink:#111;--bls-muted:#6b7280;--bls-line:#e5e7eb;--bls-bg:#fff;--bls-soft:#f7f7f5;--bls-accent:#111;--bls-good:#1f7a4d;--bls-radius:10px;color:var(--bls-ink);}
+  .bls *{box-sizing:border-box;}
+  .bls__wrap{max-width:1280px;margin:0 auto;padding:28px 16px 56px;}
+  .bls__title{font-size:clamp(24px,3vw,36px);line-height:1.15;margin:0 0 6px;text-align:center;}
+  .bls__sub{margin:0 auto 22px;text-align:center;color:var(--bls-muted);max-width:60ch;}
+  .bls__steps{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 0 28px;}
+  .bls__step{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--bls-muted);}
+  .bls__step b{width:24px;height:24px;border-radius:50%;border:1px solid var(--bls-line);display:grid;place-items:center;font-weight:600;font-size:12px;}
+  .bls__step.is-done b,.bls__step.is-active b{background:var(--bls-accent);color:#fff;border-color:var(--bls-accent);}
+  .bls__step.is-active{color:var(--bls-ink);}
+  .bls__grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:32px;align-items:start;}
+  .bls__panel{border-top:1px solid var(--bls-line);padding-top:20px;margin-bottom:34px;}
+  .bls__panel-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+  .bls__panel-head h3{margin:0;font-size:18px;}
+  .bls__panel-note{font-size:13px;color:var(--bls-muted);}
+  .bls__products{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+  .bls__card{border:1px solid var(--bls-line);border-radius:var(--bls-radius);background:var(--bls-bg);padding:8px;cursor:pointer;text-align:left;font:inherit;color:inherit;transition:border-color .15s ease,box-shadow .15s ease;}
+  .bls__card:hover{border-color:#c9c9c9;}
+  .bls__card:focus-visible{outline:2px solid var(--bls-accent);outline-offset:2px;}
+  .bls__card[aria-pressed="true"]{border-color:var(--bls-accent);box-shadow:inset 0 0 0 1px var(--bls-accent);}
+  .bls__card img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:6px;display:block;background:var(--bls-soft);}
+  .bls__card-name{font-size:13px;line-height:1.35;margin:8px 0 2px;}
+  .bls__card-price{font-size:13px;font-weight:600;}
+  .bls__card-sold{font-size:12px;color:var(--bls-muted);}
+  .bls__sizes{margin-top:16px;padding:14px;background:var(--bls-soft);border-radius:var(--bls-radius);}
+  .bls__sizes[hidden]{display:none;}
+  .bls__sizes-label{font-size:13px;margin:0 0 10px;}
+  .bls__sizes-row{display:flex;flex-wrap:wrap;gap:8px;}
+  .bls__size{min-width:48px;padding:9px 12px;border:1px solid var(--bls-line);background:#fff;border-radius:6px;font:inherit;font-size:13px;cursor:pointer;}
+  .bls__size[aria-pressed="true"]{background:var(--bls-accent);color:#fff;border-color:var(--bls-accent);}
+  .bls__size[disabled]{opacity:.35;cursor:not-allowed;text-decoration:line-through;}
+  .bls__summary{position:sticky;top:100px;border:1px solid var(--bls-line);border-radius:var(--bls-radius);padding:20px;background:var(--bls-bg);}
+  .bls__summary h3{margin:0 0 14px;font-size:17px;}
+  .bls__slot{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--bls-line);}
+  .bls__slot img{width:56px;height:72px;object-fit:cover;border-radius:6px;background:var(--bls-soft);}
+  .bls__slot-body{flex:1;min-width:0;}
+  .bls__slot-title{font-size:13px;line-height:1.35;}
+  .bls__slot-meta{font-size:12px;color:var(--bls-muted);}
+  .bls__slot-remove{border:0;background:none;font:inherit;font-size:12px;color:var(--bls-muted);text-decoration:underline;cursor:pointer;padding:0;}
+  .bls__slot.is-empty .bls__slot-title{color:var(--bls-muted);}
+  .bls__totals{margin:16px 0;font-size:14px;}
+  .bls__row{display:flex;justify-content:space-between;padding:5px 0;}
+  .bls__row--save{color:var(--bls-good);}
+  .bls__row--total{font-size:17px;font-weight:700;border-top:1px solid var(--bls-line);margin-top:8px;padding-top:12px;}
+  .bls__was{color:var(--bls-muted);text-decoration:line-through;font-weight:400;margin-right:8px;}
+  .bls__add{width:100%;padding:15px;border:0;border-radius:8px;background:var(--bls-accent);color:#fff;font:inherit;font-weight:600;cursor:pointer;}
+  .bls__add[disabled]{opacity:.4;cursor:not-allowed;}
+  .bls__done{margin:10px 0 0;font-size:13px;color:var(--bls-good);text-align:center;}
+  .bls__done[hidden]{display:none;}
+  .bls__perks{list-style:none;margin:16px 0 0;padding:0;font-size:12px;color:var(--bls-muted);display:grid;gap:6px;}
+  .bls__empty{padding:24px;border:1px dashed var(--bls-line);border-radius:var(--bls-radius);color:var(--bls-muted);font-size:14px;}
+  @media (max-width:1024px){.bls__grid{grid-template-columns:1fr;}.bls__products{grid-template-columns:repeat(3,minmax(0,1fr));}.bls__summary{position:static;}}
+  @media (max-width:640px){.bls__products{grid-template-columns:repeat(2,minmax(0,1fr));}.bls__wrap{padding:20px 12px 40px;}}
+  @media (prefers-reduced-motion:reduce){.bls *{transition:none!important;}}
+</style>
+
+<section class="bls" id="bls-{{ uid }}" data-discount="{{ disc }}" data-code="{{ section.settings.discount_code | escape }}" data-bundle="{{ section.settings.bundle_tag | escape }}">
+  <div class="bls__wrap">
+
+    <h1 class="bls__title">{{ section.settings.heading }}</h1>
+    {%- if section.settings.subheading != blank -%}
+      <p class="bls__sub">{{ section.settings.subheading }}</p>
+    {%- endif -%}
+
+    <div class="bls__steps">
+      <div class="bls__step is-active" data-step="1"><b>1</b><span>{{ section.settings.step1_label }}</span></div>
+      <div class="bls__step" data-step="2"><b>2</b><span>{{ section.settings.step2_label }}</span></div>
+      <div class="bls__step" data-step="3"><b>3</b><span>{{ section.settings.step3_label }}</span></div>
+    </div>
+
+    <div class="bls__grid">
+      <div>
+        {%- comment -%} ---------- STEP 1: TOP ---------- {%- endcomment -%}
+        <div class="bls__panel" data-group="top">
+          <div class="bls__panel-head">
+            <h3>{{ section.settings.step1_title }}</h3>
+            <span class="bls__panel-note" data-selected-note>{{ section.settings.not_selected_text }}</span>
+          </div>
+
+          {%- assign top_count = 0 -%}
+          <div class="bls__products">
+            {%- for product in col_top.products limit: 50 -%}
+              {%- assign match = false -%}
+              {%- if section.settings.types_top == blank -%}
+                {%- assign match = true -%}
+              {%- else -%}
+                {%- assign ptype = product.type | downcase -%}
+                {%- for t in types_top -%}
+                  {%- assign needle = t | strip -%}
+                  {%- if needle != blank and ptype contains needle -%}{%- assign match = true -%}{%- endif -%}
+                {%- endfor -%}
+              {%- endif -%}
+
+              {%- if match and product.available -%}
+                {%- assign top_count = top_count | plus: 1 -%}
+                <button type="button" class="bls__card" aria-pressed="false"
+                        data-product
+                        data-title="{{ product.title | escape }}"
+                        data-image="{{ product.featured_image | image_url: width: 200 }}"
+                        data-variants='{% capture vjson %}[{% for v in product.variants %}{"id":{{ v.id }},"title":{{ v.title | json }},"price":{{ v.price }},"available":{{ v.available }}}{% unless forloop.last %},{% endunless %}{% endfor %}]{% endcapture %}{{ vjson | escape }}'>
+                  {%- if product.featured_image -%}
+                    <img src="{{ product.featured_image | image_url: width: 400 }}"
+                         srcset="{{ product.featured_image | image_url: width: 300 }} 300w, {{ product.featured_image | image_url: width: 600 }} 600w"
+                         sizes="(max-width:640px) 45vw, 20vw"
+                         alt="{{ product.featured_image.alt | escape }}" loading="lazy" width="400" height="533">
+                  {%- else -%}
+                    <img src="{{ 'product-1' | placeholder_svg_tag }}" alt="" width="400" height="533">
+                  {%- endif -%}
+                  <div class="bls__card-name">{{ product.title }}</div>
+                  <div class="bls__card-price">{{ product.price | money }}</div>
+                </button>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+
+          {%- if top_count == 0 -%}
+            <p class="bls__empty">{{ section.settings.empty_text }}</p>
+          {%- endif -%}
+
+          <div class="bls__sizes" data-sizes hidden>
+            <p class="bls__sizes-label">{{ section.settings.size_label }}</p>
+            <div class="bls__sizes-row" data-sizes-row></div>
+          </div>
+        </div>
+
+        {%- comment -%} ---------- STEP 2: BOTTOM ---------- {%- endcomment -%}
+        <div class="bls__panel" data-group="bottom">
+          <div class="bls__panel-head">
+            <h3>{{ section.settings.step2_title }}</h3>
+            <span class="bls__panel-note" data-selected-note>{{ section.settings.not_selected_text }}</span>
+          </div>
+
+          {%- assign bottom_count = 0 -%}
+          <div class="bls__products">
+            {%- for product in col_bottom.products limit: 50 -%}
+              {%- assign match = false -%}
+              {%- if section.settings.types_bottom == blank -%}
+                {%- assign match = true -%}
+              {%- else -%}
+                {%- assign ptype = product.type | downcase -%}
+                {%- for t in types_bottom -%}
+                  {%- assign needle = t | strip -%}
+                  {%- if needle != blank and ptype contains needle -%}{%- assign match = true -%}{%- endif -%}
+                {%- endfor -%}
+              {%- endif -%}
+
+              {%- if match and product.available -%}
+                {%- assign bottom_count = bottom_count | plus: 1 -%}
+                <button type="button" class="bls__card" aria-pressed="false"
+                        data-product
+                        data-title="{{ product.title | escape }}"
+                        data-image="{{ product.featured_image | image_url: width: 200 }}"
+                        data-variants='{% capture vjson2 %}[{% for v in product.variants %}{"id":{{ v.id }},"title":{{ v.title | json }},"price":{{ v.price }},"available":{{ v.available }}}{% unless forloop.last %},{% endunless %}{% endfor %}]{% endcapture %}{{ vjson2 | escape }}'>
+                  {%- if product.featured_image -%}
+                    <img src="{{ product.featured_image | image_url: width: 400 }}"
+                         srcset="{{ product.featured_image | image_url: width: 300 }} 300w, {{ product.featured_image | image_url: width: 600 }} 600w"
+                         sizes="(max-width:640px) 45vw, 20vw"
+                         alt="{{ product.featured_image.alt | escape }}" loading="lazy" width="400" height="533">
+                  {%- else -%}
+                    <img src="{{ 'product-1' | placeholder_svg_tag }}" alt="" width="400" height="533">
+                  {%- endif -%}
+                  <div class="bls__card-name">{{ product.title }}</div>
+                  <div class="bls__card-price">{{ product.price | money }}</div>
+                </button>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+
+          {%- if bottom_count == 0 -%}
+            <p class="bls__empty">{{ section.settings.empty_text }}</p>
+          {%- endif -%}
+
+          <div class="bls__sizes" data-sizes hidden>
+            <p class="bls__sizes-label">{{ section.settings.size_label }}</p>
+            <div class="bls__sizes-row" data-sizes-row></div>
+          </div>
+        </div>
+      </div>
+
+      {%- comment -%} ---------- SUMMARY ---------- {%- endcomment -%}
+      <aside class="bls__summary">
+        <h3>{{ section.settings.summary_title }}</h3>
+
+        <div class="bls__slot is-empty" data-slot="top">
+          <img alt="" data-slot-img src="{{ 'product-1' | placeholder_svg_tag }}">
+          <div class="bls__slot-body">
+            <div class="bls__slot-title" data-slot-title>{{ section.settings.slot_top_empty }}</div>
+            <div class="bls__slot-meta" data-slot-meta></div>
+          </div>
+          <button type="button" class="bls__slot-remove" data-slot-remove hidden>{{ section.settings.remove_text }}</button>
+        </div>
+
+        <div class="bls__slot is-empty" data-slot="bottom">
+          <img alt="" data-slot-img src="{{ 'product-1' | placeholder_svg_tag }}">
+          <div class="bls__slot-body">
+            <div class="bls__slot-title" data-slot-title>{{ section.settings.slot_bottom_empty }}</div>
+            <div class="bls__slot-meta" data-slot-meta></div>
+          </div>
+          <button type="button" class="bls__slot-remove" data-slot-remove hidden>{{ section.settings.remove_text }}</button>
+        </div>
+
+        <div class="bls__totals">
+          <div class="bls__row"><span>{{ section.settings.subtotal_text }}</span><span data-subtotal>—</span></div>
+          <div class="bls__row bls__row--save"><span>{{ section.settings.discount_text }}</span><span data-savings>−{{ disc }}%</span></div>
+          <div class="bls__row bls__row--total"><span>{{ section.settings.total_text }}</span><span data-total>—</span></div>
+        </div>
+
+        <button type="button" class="bls__add" data-add disabled>{{ section.settings.cta_text }}</button>
+        <p class="bls__done" data-done hidden>{{ section.settings.added_text }}</p>
+
+        {%- if section.settings.perks != blank -%}
+          <ul class="bls__perks">
+            {%- assign perks = section.settings.perks | split: '|' -%}
+            {%- for p in perks -%}<li>{{ p | strip }}</li>{%- endfor -%}
+          </ul>
+        {%- endif -%}
+      </aside>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  var root = document.getElementById('bls-{{ uid }}');
+  if(!root) return;
+
+  var moneyFormat = {{ shop.money_format | json }};
+  var discount = parseFloat(root.dataset.discount) || 0;
+  var code = root.dataset.code || '';
+  var bundleTag = root.dataset.bundle || '';
+  var state = { top:null, bottom:null };
+
+  function money(cents){
+    var v = (cents/100);
+    var out = moneyFormat
+      .replace(/\{\{\s*amount\s*\}\}/, v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','))
+      .replace(/\{\{\s*amount_no_decimals\s*\}\}/, Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','))
+      .replace(/\{\{\s*amount_with_comma_separator\s*\}\}/, v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.'))
+      .replace(/\{\{\s*amount_no_decimals_with_comma_separator\s*\}\}/, Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
+    return out;
+  }
+
+  function panel(group){ return root.querySelector('[data-group="'+group+'"]'); }
+
+  function renderSizes(group, card){
+    var box = panel(group).querySelector('[data-sizes]');
+    var row = box.querySelector('[data-sizes-row]');
+    var variants = JSON.parse(card.dataset.variants);
+    row.innerHTML = '';
+    variants.forEach(function(v){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'bls__size';
+      b.textContent = v.title;
+      b.setAttribute('aria-pressed','false');
+      if(!v.available){ b.disabled = true; }
+      b.addEventListener('click', function(){
+        row.querySelectorAll('.bls__size').forEach(function(x){ x.setAttribute('aria-pressed','false'); });
+        b.setAttribute('aria-pressed','true');
+        state[group] = {
+          id: v.id, size: v.title, price: v.price,
+          title: card.dataset.title, image: card.dataset.image
+        };
+        update();
+        if(group === 'top') preselect('bottom', v.title);
+      });
+      row.appendChild(b);
+    });
+    box.hidden = false;
+  }
+
+  function preselect(group, size){
+    var p = panel(group);
+    var active = p.querySelector('.bls__card[aria-pressed="true"]');
+    if(!active) return;
+    var btns = p.querySelectorAll('.bls__size');
+    for(var i=0;i<btns.length;i++){
+      if(btns[i].textContent === size && !btns[i].disabled){ btns[i].click(); return; }
+    }
+  }
+
+  ['top','bottom'].forEach(function(group){
+    var p = panel(group);
+    if(!p) return;
+    p.querySelectorAll('[data-product]').forEach(function(card){
+      card.addEventListener('click', function(){
+        p.querySelectorAll('[data-product]').forEach(function(c){ c.setAttribute('aria-pressed','false'); });
+        card.setAttribute('aria-pressed','true');
+        state[group] = null;
+        renderSizes(group, card);
+        p.querySelector('[data-selected-note]').textContent = card.dataset.title;
+        update();
+        var sizes = p.querySelector('[data-sizes]');
+        if(sizes) sizes.scrollIntoView({behavior:'smooth', block:'nearest'});
+      });
+    });
+    root.querySelector('[data-slot="'+group+'"] [data-slot-remove]')
+      .addEventListener('click', function(){
+        state[group] = null;
+        p.querySelectorAll('[data-product]').forEach(function(c){ c.setAttribute('aria-pressed','false'); });
+        p.querySelector('[data-sizes]').hidden = true;
+        p.querySelector('[data-selected-note]').textContent = {{ section.settings.not_selected_text | json }};
+        update();
+      });
+  });
+
+  function fillSlot(group, empties){
+    var slot = root.querySelector('[data-slot="'+group+'"]');
+    var s = state[group];
+    var rm = slot.querySelector('[data-slot-remove]');
+    if(s){
+      slot.classList.remove('is-empty');
+      slot.querySelector('[data-slot-title]').textContent = s.title;
+      slot.querySelector('[data-slot-meta]').textContent = s.size + ' · ' + money(s.price);
+      if(s.image) slot.querySelector('[data-slot-img]').src = s.image;
+      rm.hidden = false;
+    } else {
+      slot.classList.add('is-empty');
+      slot.querySelector('[data-slot-title]').textContent = empties;
+      slot.querySelector('[data-slot-meta]').textContent = '';
+      rm.hidden = true;
+    }
+  }
+
+  function update(){
+    fillSlot('top', {{ section.settings.slot_top_empty | json }});
+    fillSlot('bottom', {{ section.settings.slot_bottom_empty | json }});
+
+    var ready = !!(state.top && state.bottom);
+    var sub = (state.top ? state.top.price : 0) + (state.bottom ? state.bottom.price : 0);
+    var total = Math.round(sub * (1 - discount/100));
+
+    root.querySelector('[data-subtotal]').textContent = sub ? money(sub) : '—';
+    root.querySelector('[data-savings]').textContent = ready ? '− ' + money(sub - total) : '−' + discount + '%';
+    root.querySelector('[data-total]').innerHTML = ready
+      ? '<span class="bls__was">' + money(sub) + '</span>' + money(total)
+      : '—';
+
+    root.querySelector('[data-add]').disabled = !ready;
+
+    var steps = root.querySelectorAll('.bls__step');
+    steps.forEach(function(s){ s.classList.remove('is-active','is-done'); });
+    if(!state.top){ steps[0].classList.add('is-active'); }
+    else if(!state.bottom){ steps[0].classList.add('is-done'); steps[1].classList.add('is-active'); }
+    else { steps[0].classList.add('is-done'); steps[1].classList.add('is-done'); steps[2].classList.add('is-active'); }
+  }
+
+  root.querySelector('[data-add]').addEventListener('click', function(){
+    if(!state.top || !state.bottom) return;
+    var btn = this;
+    btn.disabled = true;
+    var props = bundleTag ? { '_bundle': bundleTag } : {};
+    fetch('/cart/add.js', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body: JSON.stringify({ items:[
+        { id: state.top.id, quantity:1, properties: props },
+        { id: state.bottom.id, quantity:1, properties: props }
+      ]})
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(){
+      root.querySelector('[data-done]').hidden = false;
+      if(code){ window.location.href = '/discount/' + encodeURIComponent(code) + '?redirect=/cart'; }
+      else { window.location.href = '/cart'; }
+    })
+    .catch(function(){ btn.disabled = false; });
+  });
+
+  update();
+})();
+</script>
+
+{% schema %}
+{
+  "name": "BLS Builder",
+  "tag": "section",
+  "settings": [
+    { "type": "header", "content": "Copy" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Build Your Base Layer Set 250" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Choose your top and your bottoms. The bundle discount is applied automatically." },
+    { "type": "text", "id": "step1_label", "label": "Step 1 label", "default": "Select top" },
+    { "type": "text", "id": "step2_label", "label": "Step 2 label", "default": "Select bottoms" },
+    { "type": "text", "id": "step3_label", "label": "Step 3 label", "default": "Add to basket" },
+    { "type": "text", "id": "step1_title", "label": "Step 1 title", "default": "Step 1 — Choose your top" },
+    { "type": "text", "id": "step2_title", "label": "Step 2 title", "default": "Step 2 — Choose your bottoms" },
+    { "type": "text", "id": "size_label", "label": "Size picker label", "default": "Choose your size" },
+    { "type": "text", "id": "not_selected_text", "label": "Nothing selected yet", "default": "Nothing selected yet" },
+    { "type": "text", "id": "empty_text", "label": "Empty collection message", "default": "No products found. Check the collection and product types for this step in the theme editor." },
+
+    { "type": "header", "content": "Products" },
+    { "type": "collection", "id": "collection_top", "label": "Top collection" },
+    { "type": "text", "id": "types_top", "label": "Top product types (comma separated)", "info": "Matches on 'contains'. Leave empty to use every product in the collection. Example: Women's Long Sleeve 250" },
+    { "type": "collection", "id": "collection_bottom", "label": "Bottoms collection" },
+    { "type": "text", "id": "types_bottom", "label": "Bottoms product types (comma separated)", "info": "Example: Women's Pants 250" },
+
+    { "type": "header", "content": "Bundle discount" },
+    { "type": "range", "id": "discount_percent", "label": "Discount shown on page", "min": 0, "max": 50, "step": 1, "unit": "%", "default": 15, "info": "Display only. Create the matching automatic discount or discount code in Shopify Admin > Discounts." },
+    { "type": "text", "id": "discount_code", "label": "Discount code to apply on add to basket", "info": "Optional. Leave empty if you use an automatic discount." },
+    { "type": "text", "id": "bundle_tag", "label": "Line item tag", "default": "BLS-250", "info": "Saved as a hidden _bundle property on both items. Useful for reporting and for discount conditions." },
+
+    { "type": "header", "content": "Summary panel" },
+    { "type": "text", "id": "summary_title", "label": "Title", "default": "Your set" },
+    { "type": "text", "id": "slot_top_empty", "label": "Empty top text", "default": "Top not selected" },
+    { "type": "text", "id": "slot_bottom_empty", "label": "Empty bottoms text", "default": "Bottoms not selected" },
+    { "type": "text", "id": "remove_text", "label": "Remove", "default": "Remove" },
+    { "type": "text", "id": "subtotal_text", "label": "Subtotal label", "default": "Subtotal" },
+    { "type": "text", "id": "discount_text", "label": "Discount label", "default": "Bundle discount" },
+    { "type": "text", "id": "total_text", "label": "Total label", "default": "Total" },
+    { "type": "text", "id": "cta_text", "label": "Button", "default": "Add set to basket" },
+    { "type": "text", "id": "added_text", "label": "Confirmation", "default": "Added to your basket" },
+    { "type": "textarea", "id": "perks", "label": "Perks (separate with |)", "default": "Free UK delivery on orders over £49.99 | 30-day returns | 100% merino wool" }
+  ],
+  "presets": [{ "name": "BLS Builder" }]
+}
+{% endschema %}
+

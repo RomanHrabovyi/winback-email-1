@@ -1,0 +1,60 @@
+{
+  "sections": {
+    "main": {
+      "type": "bls-hub",
+      "settings": {
+        "heading": "Men's base layer sets",
+        "subheading": "Pick your weight, pick your pieces, save 15% on every set."
+      },
+      "blocks": {
+        "card_165": {
+          "type": "card",
+          "settings": {
+            "flag": "",
+            "gsm": "165 GSM",
+            "weight": "Lightweight",
+            "tags": "Everyday, Layering, Hiking",
+            "save": "Save 15%",
+            "description": "The lightest layer. Perfect for mild days or wearing under a jacket when it gets cold.",
+            "cta": "Build your 165 set",
+            "link": ""
+          }
+        },
+        "card_250": {
+          "type": "card",
+          "settings": {
+            "flag": "Best seller",
+            "gsm": "250 GSM",
+            "weight": "Midweight",
+            "tags": "Versatile, Skiing, Hiking",
+            "save": "Save 15%",
+            "description": "The all-rounder. The right balance of warmth for cold British winter days.",
+            "cta": "Build your 250 set",
+            "link": ""
+          }
+        },
+        "card_320": {
+          "type": "card",
+          "settings": {
+            "flag": "",
+            "gsm": "320 GSM",
+            "weight": "Heavyweight",
+            "tags": "Extreme cold, Camping, Walking",
+            "save": "Save 15%",
+            "description": "Maximum warmth. Built for the coldest conditions and extended outdoor activity.",
+            "cta": "Build your 320 set",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "card_165",
+        "card_250",
+        "card_320"
+      ]
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
