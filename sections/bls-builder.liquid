@@ -59,7 +59,8 @@
   .bls__summary{position:sticky;top:100px;border:1px solid var(--bls-line);border-radius:var(--bls-radius);padding:20px;background:var(--bls-bg);}
   .bls__summary h3{margin:0 0 14px;font-size:17px;font-weight:800;text-transform:uppercase;}
   .bls__slot{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--bls-line);}
-  .bls__slot img{width:56px;height:72px;object-fit:cover;border-radius:6px;background:var(--bls-soft);}
+  .bls__slot .bls__slot-img{width:56px;height:72px;object-fit:cover;border-radius:6px;background:var(--bls-soft);}
+  .bls__empty-bundle{padding:16px 0;color:var(--bls-muted);font-size:13px;text-align:center;border-bottom:1px solid var(--bls-line);margin:0;}
   .bls__slot-body{flex:1;min-width:0;}
   .bls__slot-title{font-size:13px;line-height:1.35;}
   .bls__slot-meta{font-size:12px;color:var(--bls-muted);}
@@ -230,23 +231,8 @@
       <aside class="bls__summary">
         <h3>{{ section.settings.summary_title }}</h3>
 
-        <div class="bls__slot is-empty" data-slot="top">
-          <img alt="" data-slot-img src="{{ 'product-1' | placeholder_svg_tag }}">
-          <div class="bls__slot-body">
-            <div class="bls__slot-title" data-slot-title>{{ section.settings.slot_top_empty }}</div>
-            <div class="bls__slot-meta" data-slot-meta></div>
-          </div>
-          <button type="button" class="bls__slot-remove" data-slot-remove hidden>{{ section.settings.remove_text }}</button>
-        </div>
-
-        <div class="bls__slot is-empty" data-slot="bottom">
-          <img alt="" data-slot-img src="{{ 'product-1' | placeholder_svg_tag }}">
-          <div class="bls__slot-body">
-            <div class="bls__slot-title" data-slot-title>{{ section.settings.slot_bottom_empty }}</div>
-            <div class="bls__slot-meta" data-slot-meta></div>
-          </div>
-          <button type="button" class="bls__slot-remove" data-slot-remove hidden>{{ section.settings.remove_text }}</button>
-        </div>
+        <div data-bundle-list></div>
+        <p class="bls__empty-bundle" data-empty-bundle>{{ section.settings.not_selected_text }}</p>
 
         <div class="bls__totals">
           <div class="bls__row"><span>{{ section.settings.subtotal_text }}</span><span data-subtotal>—</span></div>
@@ -277,7 +263,9 @@
   var discount = parseFloat(root.dataset.discount) || 0;
   var code = root.dataset.code || '';
   var bundleTag = root.dataset.bundle || '';
-  var state = { top: null, bottom: null };
+  var removeText = {{ section.settings.remove_text | json }};
+  var notSelectedText = {{ section.settings.not_selected_text | json }};
+  var state = { top: [], bottom: [] };
 
   function money(cents){
     var v = (cents/100);
@@ -303,20 +291,21 @@
       var opt = sel.options[sel.selectedIndex];
       if(!sel.value) return;
 
-      state[group] = {
-        id: parseInt(sel.value),
+      var variantId = parseInt(sel.value);
+      if(state[group].some(function(item){ return item.id === variantId; })) return;
+
+      state[group].push({
+        id: variantId,
         size: opt.textContent.trim(),
         price: parseInt(opt.dataset.price),
         title: card.dataset.title,
         image: card.dataset.image
-      };
+      });
 
-      var panel = root.querySelector('[data-group="' + group + '"]');
-      panel.querySelectorAll('[data-product]').forEach(function(c){ c.dataset.picked = 'false'; });
-      card.dataset.picked = 'true';
-      panel.querySelector('[data-selected-note]').textContent = card.dataset.title;
+      sel.selectedIndex = 0;
+      btn.disabled = true;
 
-      if(group === 'top' && !state.bottom){
+      if(group === 'top' && state.bottom.length === 0){
         var size = opt.textContent.trim();
         root.querySelectorAll('[data-group="bottom"] [data-size-select]').forEach(function(bSel){
           for(var i = 0; i < bSel.options.length; i++){
@@ -333,44 +322,69 @@
     });
   });
 
-  ['top','bottom'].forEach(function(group){
-    var rmBtn = root.querySelector('[data-slot="' + group + '"] [data-slot-remove]');
-    if(!rmBtn) return;
-    rmBtn.addEventListener('click', function(){
-      state[group] = null;
-      var panel = root.querySelector('[data-group="' + group + '"]');
-      panel.querySelectorAll('[data-product]').forEach(function(c){ c.dataset.picked = 'false'; });
-      panel.querySelectorAll('[data-size-select]').forEach(function(s){ s.selectedIndex = 0; s.dispatchEvent(new Event('change')); });
-      panel.querySelector('[data-selected-note]').textContent = {{ section.settings.not_selected_text | json }};
-      update();
-    });
-  });
+  function removeItem(group, variantId){
+    state[group] = state[group].filter(function(item){ return item.id !== variantId; });
+    update();
+  }
 
-  function fillSlot(group, emptyText){
-    var slot = root.querySelector('[data-slot="' + group + '"]');
-    var s = state[group];
-    var rm = slot.querySelector('[data-slot-remove]');
-    if(s){
-      slot.classList.remove('is-empty');
-      slot.querySelector('[data-slot-title]').textContent = s.title;
-      slot.querySelector('[data-slot-meta]').textContent = s.size + ' · ' + money(s.price);
-      if(s.image) slot.querySelector('[data-slot-img]').src = s.image;
-      rm.hidden = false;
-    } else {
-      slot.classList.add('is-empty');
-      slot.querySelector('[data-slot-title]').textContent = emptyText;
-      slot.querySelector('[data-slot-meta]').textContent = '';
-      rm.hidden = true;
-    }
+  function renderBundleList(){
+    var list = root.querySelector('[data-bundle-list]');
+    var emptyMsg = root.querySelector('[data-empty-bundle]');
+    var count = state.top.length + state.bottom.length;
+    list.innerHTML = '';
+
+    if(count === 0){ emptyMsg.hidden = false; return; }
+    emptyMsg.hidden = true;
+
+    ['top','bottom'].forEach(function(group){
+      state[group].forEach(function(item){
+        var el = document.createElement('div');
+        el.className = 'bls__slot';
+        el.innerHTML =
+          '<img src="' + (item.image || '') + '" alt="" class="bls__slot-img">' +
+          '<div class="bls__slot-body">' +
+            '<div class="bls__slot-title">' + item.title + '</div>' +
+            '<div class="bls__slot-meta">' + item.size + ' · ' + money(item.price) + '</div>' +
+          '</div>' +
+          '<button type="button" class="bls__slot-remove">' + removeText + '</button>';
+        el.querySelector('.bls__slot-remove').addEventListener('click', function(){
+          removeItem(group, item.id);
+        });
+        list.appendChild(el);
+      });
+    });
   }
 
   function update(){
-    fillSlot('top', {{ section.settings.slot_top_empty | json }});
-    fillSlot('bottom', {{ section.settings.slot_bottom_empty | json }});
+    renderBundleList();
 
-    var ready = !!(state.top && state.bottom);
-    var sub = (state.top ? state.top.price : 0) + (state.bottom ? state.bottom.price : 0);
+    var hasTop = state.top.length > 0;
+    var hasBottom = state.bottom.length > 0;
+    var ready = hasTop && hasBottom;
+
+    var sub = 0;
+    state.top.forEach(function(i){ sub += i.price; });
+    state.bottom.forEach(function(i){ sub += i.price; });
     var total = Math.round(sub * (1 - discount / 100));
+
+    ['top','bottom'].forEach(function(group){
+      var panel = root.querySelector('[data-group="' + group + '"]');
+      var note = panel.querySelector('[data-selected-note]');
+      note.textContent = state[group].length === 0
+        ? notSelectedText
+        : state[group].length + ' selected';
+
+      panel.querySelectorAll('[data-product]').forEach(function(card){
+        var sel = card.querySelector('[data-size-select]');
+        var hasPicked = false;
+        for(var i = 0; i < sel.options.length; i++){
+          if(sel.options[i].value && state[group].some(function(item){ return item.id === parseInt(sel.options[i].value); })){
+            hasPicked = true; break;
+          }
+        }
+        card.dataset.picked = hasPicked ? 'true' : 'false';
+      });
+    });
 
     root.querySelector('[data-subtotal]').textContent = sub ? money(sub) : '—';
     root.querySelector('[data-savings]').textContent = ready ? '− ' + money(sub - total) : '−' + discount + '%';
@@ -385,9 +399,9 @@
     steps.forEach(function(s){ s.classList.remove('is-active','is-done'); });
     lines.forEach(function(l){ l.classList.remove('is-done'); });
 
-    if(!state.top){
+    if(!hasTop){
       steps[0].classList.add('is-active');
-    } else if(!state.bottom){
+    } else if(!hasBottom){
       steps[0].classList.add('is-done');
       lines[0].classList.add('is-done');
       steps[1].classList.add('is-active');
@@ -401,17 +415,18 @@
   }
 
   root.querySelector('[data-add]').addEventListener('click', function(){
-    if(!state.top || !state.bottom) return;
+    if(state.top.length === 0 || state.bottom.length === 0) return;
     var btn = this;
     btn.disabled = true;
     var props = bundleTag ? { '_bundle': bundleTag } : {};
+    var items = [];
+    state.top.forEach(function(i){ items.push({ id: i.id, quantity: 1, properties: props }); });
+    state.bottom.forEach(function(i){ items.push({ id: i.id, quantity: 1, properties: props }); });
+
     fetch('/cart/add.js', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ items: [
-        { id: state.top.id, quantity: 1, properties: props },
-        { id: state.bottom.id, quantity: 1, properties: props }
-      ]})
+      body: JSON.stringify({ items: items })
     })
     .then(function(r){ return r.json(); })
     .then(function(){
