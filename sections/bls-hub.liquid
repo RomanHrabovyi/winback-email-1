@@ -1,33 +1,41 @@
 {%- comment -%}
-  ============================================================
   BLS HUB — "Build Your Set" chooser (165 / 250 / 320)
-  Merino.tech UK / merinotech.co.uk
-  Used on the two landing pages (women's and men's).
-  ============================================================
+  Merino.tech UK — matches US (merino.tech) visual design
 {%- endcomment -%}
 
 <style>
-  .blsh{--h-ink:#111;--h-muted:#6b7280;--h-line:#e5e7eb;--h-soft:#f7f7f5;--h-good:#1f7a4d;color:var(--h-ink);}
+  .blsh{--h-ink:#111;--h-muted:#6b7280;--h-line:#e5e7eb;--h-accent:#c8102e;color:var(--h-ink);}
   .blsh *{box-sizing:border-box;}
-  .blsh__wrap{max-width:1240px;margin:0 auto;padding:36px 16px 64px;}
-  .blsh__title{font-size:clamp(26px,3.4vw,40px);line-height:1.12;margin:0 0 8px;text-align:center;}
-  .blsh__sub{margin:0 auto 34px;text-align:center;color:var(--h-muted);max-width:56ch;}
-  .blsh__cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;}
-  .blsh__card{display:flex;flex-direction:column;border:1px solid var(--h-line);border-radius:12px;overflow:hidden;background:#fff;text-decoration:none;color:inherit;}
-  .blsh__card:hover{border-color:#c9c9c9;}
-  .blsh__media{aspect-ratio:4/3;background:var(--h-soft);position:relative;}
-  .blsh__media img{width:100%;height:100%;object-fit:cover;display:block;}
-  .blsh__flag{position:absolute;top:12px;left:12px;background:#111;color:#fff;font-size:11px;letter-spacing:.04em;padding:5px 9px;border-radius:4px;}
-  .blsh__body{padding:20px;display:flex;flex-direction:column;gap:10px;flex:1;}
-  .blsh__gsm{font-size:24px;font-weight:700;line-height:1;}
-  .blsh__weight{font-size:13px;color:var(--h-muted);}
-  .blsh__tags{display:flex;gap:6px;flex-wrap:wrap;}
-  .blsh__tag{font-size:12px;border:1px solid var(--h-line);border-radius:999px;padding:3px 10px;color:var(--h-muted);}
-  .blsh__save{font-size:13px;font-weight:600;color:var(--h-good);}
-  .blsh__desc{font-size:14px;line-height:1.5;color:var(--h-muted);margin:0;}
-  .blsh__cta{margin-top:auto;display:inline-block;text-align:center;padding:13px 16px;border-radius:8px;background:#111;color:#fff;font-weight:600;font-size:14px;}
-  .blsh__card:hover .blsh__cta{background:#000;}
-  @media (max-width:900px){.blsh__cards{grid-template-columns:1fr;}}
+  .blsh__wrap{max-width:1280px;margin:0 auto;padding:40px 16px 64px;}
+  .blsh__title{font-size:clamp(26px,3.4vw,42px);line-height:1.1;margin:0 0 6px;text-align:center;text-transform:uppercase;font-weight:800;letter-spacing:.01em;}
+  .blsh__sub{margin:0 auto 10px;text-align:center;color:var(--h-muted);max-width:56ch;font-size:15px;}
+  .blsh__badge-line{text-align:center;margin:0 0 36px;}
+  .blsh__badge-link{display:inline-block;color:var(--h-accent);font-weight:700;font-size:15px;text-decoration:none;border-bottom:2px solid var(--h-accent);}
+  .blsh__cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+  .blsh__card{position:relative;display:flex;flex-direction:column;justify-content:flex-end;border-radius:14px;overflow:hidden;text-decoration:none;color:#fff;min-height:520px;cursor:pointer;}
+  .blsh__img-wrap{position:absolute;inset:0;z-index:0;}
+  .blsh__img-wrap img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .45s ease;}
+  .blsh__card:hover .blsh__img-wrap img{transform:scale(1.06);}
+  .blsh__overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(0,0,0,.72) 0%,rgba(0,0,0,.18) 50%,rgba(0,0,0,.05) 100%);pointer-events:none;}
+  .blsh__badge-weight{position:absolute;top:14px;left:14px;z-index:3;background:rgba(255,255,255,.92);color:#111;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:6px 12px;border-radius:5px;}
+  .blsh__badge-flag{position:absolute;top:14px;right:14px;z-index:3;background:var(--h-accent);color:#fff;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:6px 12px;border-radius:5px;}
+  .blsh__content{position:relative;z-index:2;padding:24px 22px 22px;display:flex;flex-direction:column;gap:6px;}
+  .blsh__gsm{font-size:13px;letter-spacing:.04em;opacity:.85;}
+  .blsh__tier{font-size:clamp(28px,3vw,40px);font-weight:800;text-transform:uppercase;line-height:1.05;letter-spacing:.01em;}
+  .blsh__tags-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+  .blsh__tag{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:var(--h-accent);color:#fff;padding:4px 10px;border-radius:4px;}
+  .blsh__save{font-size:14px;font-weight:700;}
+  .blsh__desc{font-size:14px;line-height:1.45;opacity:0;max-height:0;overflow:hidden;transition:opacity .35s ease,max-height .4s ease;}
+  .blsh__card:hover .blsh__desc{opacity:.9;max-height:80px;}
+  .blsh__cta{display:block;text-align:center;padding:14px 20px;border-radius:8px;background:var(--h-accent);color:#fff;font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.04em;margin-top:6px;opacity:0;transform:translateY(10px);transition:opacity .3s ease .05s,transform .3s ease .05s;}
+  .blsh__card:hover .blsh__cta{opacity:1;transform:translateY(0);}
+  @media (max-width:900px){
+    .blsh__cards{grid-template-columns:1fr;}
+    .blsh__card{min-height:400px;}
+    .blsh__desc{opacity:.9;max-height:80px;}
+    .blsh__cta{opacity:1;transform:translateY(0);}
+  }
+  @media (prefers-reduced-motion:reduce){.blsh *{transition:none!important;}.blsh__desc{opacity:.9;max-height:80px;}.blsh__cta{opacity:1;transform:translateY(0);}}
 </style>
 
 <section class="blsh">
@@ -36,34 +44,41 @@
     {%- if section.settings.subheading != blank -%}
       <p class="blsh__sub">{{ section.settings.subheading }}</p>
     {%- endif -%}
+    {%- if section.settings.badge_text != blank -%}
+      <p class="blsh__badge-line"><span class="blsh__badge-link">{{ section.settings.badge_text }}</span></p>
+    {%- endif -%}
 
     <div class="blsh__cards">
       {%- for block in section.blocks -%}
         <a class="blsh__card" href="{{ block.settings.link }}" {{ block.shopify_attributes }}>
-          <div class="blsh__media">
+          <div class="blsh__img-wrap">
             {%- if block.settings.image -%}
-              <img src="{{ block.settings.image | image_url: width: 800 }}"
-                   srcset="{{ block.settings.image | image_url: width: 500 }} 500w, {{ block.settings.image | image_url: width: 900 }} 900w"
+              <img src="{{ block.settings.image | image_url: width: 900 }}"
+                   srcset="{{ block.settings.image | image_url: width: 600 }} 600w, {{ block.settings.image | image_url: width: 1000 }} 1000w"
                    sizes="(max-width:900px) 92vw, 30vw"
-                   alt="{{ block.settings.image.alt | escape }}" loading="lazy" width="800" height="600">
-            {%- endif -%}
-            {%- if block.settings.flag != blank -%}
-              <span class="blsh__flag">{{ block.settings.flag }}</span>
+                   alt="{{ block.settings.image.alt | escape }}" loading="lazy" width="900" height="1200">
             {%- endif -%}
           </div>
-          <div class="blsh__body">
-            <div>
-              <div class="blsh__gsm">{{ block.settings.gsm }}</div>
-              <div class="blsh__weight">{{ block.settings.weight }}</div>
-            </div>
+          <div class="blsh__overlay"></div>
+
+          {%- if block.settings.weight != blank -%}
+            <span class="blsh__badge-weight">{{ block.settings.weight }}</span>
+          {%- endif -%}
+          {%- if block.settings.flag != blank -%}
+            <span class="blsh__badge-flag">{{ block.settings.flag }}</span>
+          {%- endif -%}
+
+          <div class="blsh__content">
+            <div class="blsh__gsm">{{ block.settings.gsm }}</div>
+            <div class="blsh__tier">{{ block.settings.tier }}</div>
             {%- if block.settings.tags != blank -%}
-              <div class="blsh__tags">
+              <div class="blsh__tags-row">
                 {%- assign tags = block.settings.tags | split: ',' -%}
                 {%- for t in tags -%}<span class="blsh__tag">{{ t | strip }}</span>{%- endfor -%}
+                {%- if block.settings.save != blank -%}
+                  <span class="blsh__save">{{ block.settings.save }}</span>
+                {%- endif -%}
               </div>
-            {%- endif -%}
-            {%- if block.settings.save != blank -%}
-              <div class="blsh__save">{{ block.settings.save }}</div>
             {%- endif -%}
             <p class="blsh__desc">{{ block.settings.description }}</p>
             <span class="blsh__cta">{{ block.settings.cta }}</span>
@@ -79,8 +94,9 @@
   "name": "BLS Hub",
   "tag": "section",
   "settings": [
-    { "type": "text", "id": "heading", "label": "Heading", "default": "Women's base layer sets" },
-    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Pick your weight, pick your pieces, save 15% on every set." }
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Build your base layer set" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Performance Merino Layers." },
+    { "type": "text", "id": "badge_text", "label": "Highlighted line", "default": "Bundle & Save 15%.", "info": "Shown as a red highlighted link below the subheading. Leave empty to hide." }
   ],
   "blocks": [
     {
@@ -88,13 +104,14 @@
       "name": "Weight card",
       "settings": [
         { "type": "image_picker", "id": "image", "label": "Image" },
-        { "type": "text", "id": "flag", "label": "Corner label", "info": "e.g. Best seller. Leave empty to hide." },
+        { "type": "text", "id": "flag", "label": "Corner badge", "info": "e.g. Best seller, Warmest. Red badge, top-right. Leave empty to hide." },
+        { "type": "text", "id": "weight", "label": "Weight badge", "default": "Midweight", "info": "Top-left badge, e.g. Lightweight, Midweight, Heavyweight." },
         { "type": "text", "id": "gsm", "label": "GSM", "default": "250 GSM" },
-        { "type": "text", "id": "weight", "label": "Weight name", "default": "Midweight" },
-        { "type": "text", "id": "tags", "label": "Tags (comma separated)", "default": "Versatile, Skiing, Hiking" },
+        { "type": "text", "id": "tier", "label": "Tier / category name", "default": "Versatile", "info": "Large text on card, e.g. Active, Versatile, Thermal." },
+        { "type": "text", "id": "tags", "label": "Tags (comma separated)", "default": "Skiing, Hiking" },
         { "type": "text", "id": "save", "label": "Saving line", "default": "Save 15%" },
-        { "type": "textarea", "id": "description", "label": "Description", "default": "The all-rounder. The right balance of warmth for cold British winter days." },
-        { "type": "text", "id": "cta", "label": "Button text", "default": "Build your 250 set" },
+        { "type": "textarea", "id": "description", "label": "Description", "default": "The ultimate all-rounder. Perfect balance of warmth for cold winter days." },
+        { "type": "text", "id": "cta", "label": "Button text", "default": "Build 250 set" },
         { "type": "url", "id": "link", "label": "Link" }
       ]
     }
@@ -103,9 +120,12 @@
   "presets": [
     {
       "name": "BLS Hub",
-      "blocks": [{ "type": "card" }, { "type": "card" }, { "type": "card" }]
+      "blocks": [
+        { "type": "card", "settings": { "weight": "Lightweight", "gsm": "165 GSM", "tier": "Active", "tags": "Running, Gym", "cta": "Build 165 set" } },
+        { "type": "card", "settings": { "flag": "Best seller", "weight": "Midweight", "gsm": "250 GSM", "tier": "Versatile", "tags": "Skiing, Hiking", "cta": "Build 250 set" } },
+        { "type": "card", "settings": { "flag": "Warmest", "weight": "Heavyweight", "gsm": "320 GSM", "tier": "Thermal", "tags": "Extreme cold", "cta": "Build 320 set" } }
+      ]
     }
   ]
 }
 {% endschema %}
-

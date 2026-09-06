@@ -4,7 +4,8 @@
       "type": "bls-hub",
       "settings": {
         "heading": "Men's base layer sets",
-        "subheading": "Pick your weight, pick your pieces, save 15% on every set."
+        "subheading": "Pick your weight, pick your pieces, save 15% on every set.",
+        "badge_text": "Bundle & Save 15%."
       },
       "blocks": {
         "card_165": {
@@ -13,6 +14,7 @@
             "flag": "",
             "gsm": "165 GSM",
             "weight": "Lightweight",
+            "tier": "Active",
             "tags": "Everyday, Layering, Hiking",
             "save": "Save 15%",
             "description": "The lightest layer. Perfect for mild days or wearing under a jacket when it gets cold.",
@@ -26,6 +28,7 @@
             "flag": "Best seller",
             "gsm": "250 GSM",
             "weight": "Midweight",
+            "tier": "Versatile",
             "tags": "Versatile, Skiing, Hiking",
             "save": "Save 15%",
             "description": "The all-rounder. The right balance of warmth for cold British winter days.",
@@ -39,6 +42,7 @@
             "flag": "",
             "gsm": "320 GSM",
             "weight": "Heavyweight",
+            "tier": "Thermal",
             "tags": "Extreme cold, Camping, Walking",
             "save": "Save 15%",
             "description": "Maximum warmth. Built for the coldest conditions and extended outdoor activity.",
