@@ -5,8 +5,8 @@
 {%- endcomment -%}
 
 {%- liquid
-  assign col_top = section.settings.collection_top
-  assign col_bottom = section.settings.collection_bottom
+  assign col_top = collections[section.settings.collection_top]
+  assign col_bottom = collections[section.settings.collection_bottom]
   assign types_top = section.settings.types_top | downcase | split: ','
   assign types_bottom = section.settings.types_bottom | downcase | split: ','
   assign disc = section.settings.discount_percent
@@ -445,9 +445,9 @@
     { "type": "text", "id": "empty_text", "label": "Empty collection message", "default": "No products found. Check the collection and product types for this step in the theme editor." },
 
     { "type": "header", "content": "Products" },
-    { "type": "collection", "id": "collection_top", "label": "Top collection" },
+    { "type": "text", "id": "collection_top", "label": "Top collection handle", "info": "The collection handle (URL slug) for tops, e.g. mens-base-layer-tops" },
     { "type": "text", "id": "types_top", "label": "Top product types (comma separated)", "info": "Matches on 'contains'. Leave empty to use every product in the collection. Example: Women's Long Sleeve 250" },
-    { "type": "collection", "id": "collection_bottom", "label": "Bottoms collection" },
+    { "type": "text", "id": "collection_bottom", "label": "Bottoms collection handle", "info": "The collection handle (URL slug) for bottoms, e.g. mens-base-layer-pants" },
     { "type": "text", "id": "types_bottom", "label": "Bottoms product types (comma separated)", "info": "Example: Women's Pants 250" },
 
     { "type": "header", "content": "Bundle discount" },
