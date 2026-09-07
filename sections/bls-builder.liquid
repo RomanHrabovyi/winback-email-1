@@ -54,6 +54,11 @@
   .bls__card-btn{width:100%;padding:11px 10px;border:0;border-radius:6px;background:var(--bls-red);color:#fff;font:inherit;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;transition:background .15s;}
   .bls__card-btn:hover{background:#a00d24;}
   .bls__card-btn:disabled{opacity:.4;cursor:not-allowed;}
+  .bls__rating{display:flex;align-items:center;gap:5px;font-size:12px;margin:-2px 0;}
+  .bls__stars{position:relative;display:inline-block;line-height:1;letter-spacing:1px;}
+  .bls__stars-bg{color:#ddd;}
+  .bls__stars-fill{position:absolute;top:0;left:0;overflow:hidden;white-space:nowrap;color:#e47911;}
+  .bls__reviews-count{color:var(--bls-muted);}
 
   /* Summary panel */
   .bls__summary{position:sticky;top:100px;border:1px solid var(--bls-line);border-radius:var(--bls-radius);padding:20px;background:var(--bls-bg);}
@@ -144,6 +149,19 @@
                   <div class="bls__card-body">
                     <div class="bls__card-name">{{ product.title }}</div>
                     <div class="bls__card-price">{{ product.price | money }}</div>
+                    {%- assign r_rating = product.metafields.reviews.rating -%}
+                    {%- assign r_count = product.metafields.reviews.rating_count.value | plus: 0 -%}
+                    {%- if r_count > 0 -%}
+                      {%- assign r_val = r_rating.value.rating | times: 1.0 -%}
+                      {%- assign r_pct = r_val | divided_by: 5.0 | times: 100.0 -%}
+                      <div class="bls__rating">
+                        <span class="bls__stars">
+                          <span class="bls__stars-bg">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                          <span class="bls__stars-fill" style="width:{{ r_pct }}%">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                        </span>
+                        <span class="bls__reviews-count">{{ r_count }} reviews</span>
+                      </div>
+                    {%- endif -%}
                     <select class="bls__card-select" data-size-select>
                       <option value="">{{ section.settings.size_label }}</option>
                       {%- for v in product.variants -%}
@@ -206,6 +224,19 @@
                   <div class="bls__card-body">
                     <div class="bls__card-name">{{ product.title }}</div>
                     <div class="bls__card-price">{{ product.price | money }}</div>
+                    {%- assign r_rating = product.metafields.reviews.rating -%}
+                    {%- assign r_count = product.metafields.reviews.rating_count.value | plus: 0 -%}
+                    {%- if r_count > 0 -%}
+                      {%- assign r_val = r_rating.value.rating | times: 1.0 -%}
+                      {%- assign r_pct = r_val | divided_by: 5.0 | times: 100.0 -%}
+                      <div class="bls__rating">
+                        <span class="bls__stars">
+                          <span class="bls__stars-bg">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                          <span class="bls__stars-fill" style="width:{{ r_pct }}%">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                        </span>
+                        <span class="bls__reviews-count">{{ r_count }} reviews</span>
+                      </div>
+                    {%- endif -%}
                     <select class="bls__card-select" data-size-select>
                       <option value="">{{ section.settings.size_label }}</option>
                       {%- for v in product.variants -%}
