@@ -1,0 +1,17 @@
+{%- comment -%}
+  Renders star rating badge on product cards (Judge.me metafields).
+  Accepts: product {Object}
+{%- endcomment -%}
+
+{%- assign r_count = product.metafields.reviews.rating_count.value | plus: 0 -%}
+{%- if r_count > 0 -%}
+  {%- assign r_val = product.metafields.reviews.rating.value.rating | times: 1.0 -%}
+  {%- assign r_pct = r_val | divided_by: 5.0 | times: 100.0 -%}
+  <div class="hdt-pr-card-rating" style="display:flex;align-items:center;gap:4px;margin:4px 0 2px;font-size:13px;line-height:1;">
+    <span style="position:relative;display:inline-block;letter-spacing:1px;">
+      <span style="color:#ddd;">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+      <span style="position:absolute;top:0;left:0;overflow:hidden;white-space:nowrap;color:#e47911;width:{{ r_pct }}%;">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+    </span>
+    <span style="color:#878787;font-size:12px;">({{ r_count }})</span>
+  </div>
+{%- endif -%}
